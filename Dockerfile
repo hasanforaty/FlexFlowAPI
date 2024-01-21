@@ -5,6 +5,8 @@ ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
+COPY ./flex_flow_api /app
+WORKDIR /app
 EXPOSE 8000
 
 ARG DEV=false
@@ -20,7 +22,7 @@ RUN python -m venv /env && \
         --no-create-home \
         django-user
 
-ENV PATH='/env/bin:$PATH'
+ENV PATH="/env/bin:$PATH"
 USER django-user
 
 
