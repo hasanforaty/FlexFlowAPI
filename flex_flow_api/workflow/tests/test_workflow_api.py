@@ -7,12 +7,12 @@ from rest_framework.test import APIClient
 from core.models import Workflow
 from workflow.serializer import WorkflowSerializer
 
-WORKFLOW_URL = reverse('workflow:workflow-list')
+WORKFLOW_URL = reverse('workflow-list')
 
 
 def detail_url(workflow_id):
     return reverse(
-        'workflow:workflow-detail',
+        'workflow-detail',
         args=[workflow_id]
     )
 

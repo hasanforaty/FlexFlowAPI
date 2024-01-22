@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core.models import (
-    Workflow
+    Workflow, Node
 )
 
 
@@ -58,3 +58,20 @@ class ModelTests(TestCase):
             create_by=user
         )
         self.assertEqual(str(workflow), workflow.title)
+
+    def test_create_Node(self):
+        """Test creating Node """
+        user = get_user_model().objects.create_user(
+            'test@example.com', 'password'
+        )
+        workflow = Workflow.objects.create(
+            title='Test Workflow',
+            description='testing workflow description',
+            create_by=user
+        )
+        node = Node.objects.create(
+            title='Test Node',
+            description='Num 1',
+            workflow=workflow
+        )
+        self.assertEqual(str(node), node.title)
