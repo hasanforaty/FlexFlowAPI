@@ -11,5 +11,3 @@ class WorkflowViewSet(viewsets.ModelViewSet):
     serializer_class = WorkflowSerializer
     permission_classes = [IsAuthenticated,]
     authentication_classes = [TokenAuthentication,]
-
-

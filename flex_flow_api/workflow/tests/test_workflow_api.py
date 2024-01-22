@@ -23,4 +23,3 @@ class PublicWorkflowApiTests(TestCase):
         """Test that login is required for accessing this endpoint"""
         res = self.client.get(WORKFLOW_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-
