@@ -75,5 +75,13 @@ class Edge(models.Model):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['n_from', 'n_to'],
+                name="unique_edge"
+            )
+        ]
+
     def __str__(self):
         return f'{self.n_from} -> {self.n_to}'
