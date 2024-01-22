@@ -1,3 +1,4 @@
+from django.core.exceptions import BadRequest
 from rest_framework import (
     viewsets, mixins,
 )
@@ -22,7 +23,8 @@ from workflow.serializer import (
 class EdgeViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
-    viewsets.GenericViewSet
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
     queryset = Edge.objects.all()
     serializer_class = EdgeSerializer
@@ -39,7 +41,7 @@ class EdgeViewSet(
         workflow_id = str(self.kwargs['workflow_pk'])
         if workflow_id:
             return Edge.objects.filter(workflow_id=workflow_id)
-        return Edge.objects.all()
+        # return Edge.objects.all()
 
 
 class NodeViewSet(

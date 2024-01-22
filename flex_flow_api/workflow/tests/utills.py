@@ -4,6 +4,7 @@ from core.models import (
 )
 from django.contrib.auth import get_user_model
 
+
 def create_workflow(user, **param):
     """Create workflow"""
     payload = {

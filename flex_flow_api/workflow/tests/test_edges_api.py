@@ -17,14 +17,14 @@ def get_edge_url(workflow_id):
     return reverse('edge-list', kwargs={'workflow_pk': workflow_id})
 
 
-# def get_node_detail_url(workflow_id, edge_id):
-#     return reverse(
-#         'edge-detail',
-#         kwargs={
-#             'workflow_pk': workflow_id,
-#             'pk': edge_id
-#         }
-#     )
+def get_edge_detail_url(workflow_id, edge_id):
+    return reverse(
+        'edge-detail',
+        kwargs={
+            'workflow_pk': workflow_id,
+            'pk': edge_id
+        }
+    )
 
 
 class PublicWorkflowApiTests(TestCase):
@@ -128,3 +128,69 @@ class PrivateWorkflowApiTests(TestCase):
         }
         res = self.client.post(url, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def create_edge(self):
+        n1 = self.nodes[0]
+        n2 = self.nodes[1]
+        return Edge.objects.create(n_from=n1, n_to=n2, workflow=self.workflow)
+
+    def test_partial_update_edge(self):
+        """Test updating edge"""
+        edge = self.create_edge()
+        n3 = self.nodes[2]
+        payload = {
+            'node_to': n3.id,
+        }
+        res = self.client.patch(
+            get_edge_detail_url(
+                workflow_id=self.workflow.id,
+                edge_id=edge.id
+            ),
+            data=payload
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        edge.refresh_from_db()
+        self.assertEqual(edge.n_to.id, payload['node_to'])
+
+    def test_update_edge_missmatch_node_and_workflow(self):
+        """Test update edge with miss matching node and workflow"""
+        edge = self.create_edge()
+        n3 = self.nodes[2]
+        payload = {
+            'node_to': n3.id,
+        }
+        workflow_2 = create_workflow(self.user, )
+        id = workflow_2.id
+        url = get_edge_detail_url(workflow_id=id, edge_id=edge.id)
+        res = self.client.patch(url, data=payload)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_edge_mismatch_nodes(self):
+        """Test update edge with miss matching nodes"""
+        edge = self.create_edge()
+        workflow_2 = create_workflow(self.user)
+        n2 = create_node(workflow=workflow_2)
+        url = get_edge_detail_url(workflow_id=self.workflow.id, edge_id=edge.id)
+        payload = {
+            'node_to': n2.id,
+        }
+        self.assertNotEqual(edge.n_from.workflow.id, n2.workflow.id)
+        res = self.client.patch(url, payload)
+        edge.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_edge_update(self):
+        """Test update edge with valid data"""
+        edge = self.create_edge()
+        n3 = self.nodes[3]
+        n4 = self.nodes[4]
+        payload = {
+            "node_from": n3.id,
+            'node_to': n4.id,
+        }
+        url = get_edge_detail_url(edge_id=edge.id, workflow_id=self.workflow.id)
+        res = self.client.put(url, data=payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        edge.refresh_from_db()
+        self.assertEqual(edge.n_from.id, payload['node_from'])
+        self.assertEqual(edge.n_to.id, payload['node_to'])
