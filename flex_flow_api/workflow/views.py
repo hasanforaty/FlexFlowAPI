@@ -10,5 +10,5 @@ from workflow.permisions import IsOwnerOfObject
 class WorkflowViewSet(viewsets.ModelViewSet):
     queryset = Workflow.objects.all()
     serializer_class = WorkflowSerializer
-    permission_classes = [IsAuthenticated,IsOwnerOfObject]
+    permission_classes = [IsAuthenticated, IsOwnerOfObject]
     authentication_classes = [TokenAuthentication,]
