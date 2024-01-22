@@ -36,4 +36,5 @@ urlpatterns = [
         'api/users/',
         include('user.urls')
     ),
+    path('api/workflow/', include('workflow.urls'))
 ]
