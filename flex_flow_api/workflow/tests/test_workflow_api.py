@@ -135,11 +135,11 @@ class PrivateWorkflowApiTests(TestCase):
         """Test deleting workflow of other user give error message"""
         user = create_user(
             email='custom@example.com',
-            password='password_custom',)
+            password='password_custom', )
 
         workflow = create_workflow(user=user)
-        res = self.client.delete(detail_url(workflow))
-        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.delete(detail_url(workflow.id))
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Workflow.objects.filter(id=workflow.id).exists())
 
     def test_retrieve_other_user_workflow(self):
@@ -162,16 +162,16 @@ class PrivateWorkflowApiTests(TestCase):
         self.assertIn(serializer1.data, res.data)
         self.assertIn(serializer2.data, res.data)
 
-    # def test_updating_workflow_of_other_user(self):
-    #     """Test updating workflow of other user give error message"""
-    #     user1 = create_user(
-    #     email='custom@example.com',
-    #     password='password_custom',
-    #     )
-    #     workflow1 = create_workflow(user=user1)
-    #     res = self.client.patch(
-    #     detail_url(workflow1.id),
-    #     {'name': 'new_name'},
-    #     format='json',
-    #     )
-    #     self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+    def test_updating_workflow_of_other_user(self):
+        """Test updating workflow of other user give error message"""
+        user1 = create_user(
+            email='custom@example.com',
+            password='password_custom',
+        )
+        workflow1 = create_workflow(user=user1)
+        res = self.client.patch(
+            detail_url(workflow1.id),
+            {'name': 'new_name'},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
