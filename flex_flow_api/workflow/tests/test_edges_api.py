@@ -194,3 +194,14 @@ class PrivateWorkflowApiTests(TestCase):
         edge.refresh_from_db()
         self.assertEqual(edge.n_from.id, payload['node_from'])
         self.assertEqual(edge.n_to.id, payload['node_to'])
+
+    def test_delete_edge(self):
+        """Test delete edge"""
+        edge = self.create_edge()
+        res = self.client.delete(
+            get_edge_detail_url(
+                edge_id=edge.id,
+                workflow_id=self.workflow.id
+            )
+        )
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)

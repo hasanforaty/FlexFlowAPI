@@ -1,7 +1,5 @@
-from django.core.exceptions import BadRequest
 from rest_framework import (
-    viewsets, mixins,
-)
+    viewsets, )
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
@@ -21,10 +19,7 @@ from workflow.serializer import (
 
 
 class EdgeViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet,
+    viewsets.ModelViewSet
 ):
     queryset = Edge.objects.all()
     serializer_class = EdgeSerializer
