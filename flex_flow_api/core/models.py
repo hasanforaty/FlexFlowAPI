@@ -57,3 +57,23 @@ class Node(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Edge(models.Model):
+    n_from = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        related_name='from+'
+    )
+    n_to = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        related_name='to+'
+    )
+    workflow = models.ForeignKey(
+        Workflow,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'{self.n_from} -> {self.n_to}'
