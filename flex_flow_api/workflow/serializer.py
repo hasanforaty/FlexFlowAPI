@@ -12,3 +12,11 @@ class WorkflowSerializer(serializers.ModelSerializer):
             'description',
         ]
         read_only_fields = ['id']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        workflow = Workflow.objects.create(
+            create_by=user,
+            **validated_data
+        )
+        return workflow
