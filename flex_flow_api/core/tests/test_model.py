@@ -123,12 +123,12 @@ class ModelTests(TestCase):
             description='Num 2',
             workflow=workflow
         )
-        edge = Edge.objects.create(
+        Edge.objects.create(
             n_from=node, n_to=node2,
             workflow=workflow
         )
         with self.assertRaises(IntegrityError):
-            edge2 = Edge.objects.create(
+            Edge.objects.create(
                 n_from=node, n_to=node2,
                 workflow=workflow
             )
