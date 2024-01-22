@@ -43,3 +43,13 @@ class Workflow(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Node(models.Model):
+    """Node model"""
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.title
