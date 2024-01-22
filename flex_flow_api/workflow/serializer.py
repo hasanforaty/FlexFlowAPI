@@ -37,7 +37,9 @@ class EdgeSerializer(serializers.ModelSerializer):
         for key in attrs.keys():
             if key in ['n_from', 'n_to']:
                 if attrs[key].workflow.id != workflow.id:
-                    raise BadRequest("Both node and workflow must be in same workflow")
+                    raise BadRequest(
+                        "Both node and workflow must be in same workflow"
+                    )
         return attrs
 
     def create(self, validated_data):

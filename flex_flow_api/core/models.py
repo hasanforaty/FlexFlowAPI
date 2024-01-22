@@ -52,7 +52,7 @@ class Node(models.Model):
         on_delete=models.CASCADE,
         related_name='nodes',
     )
-    title = models.CharField(max_length=255,blank=False)
+    title = models.CharField(max_length=255, blank=False)
     description = models.CharField(max_length=255)
 
     def __str__(self):

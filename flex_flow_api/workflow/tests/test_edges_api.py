@@ -1,11 +1,10 @@
-from django.contrib.auth import get_user_model
-from django.test import TestCase, SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Edge
-from workflow.serializer import (EdgeSerializer, EdgeDetailSerializer)
+from workflow.serializer import (EdgeDetailSerializer)
 from workflow.tests.utills import (
     create_workflow,
     create_user,
@@ -68,20 +67,28 @@ class PrivateWorkflowApiTests(TestCase):
         """Test retrieving edge"""
         n1 = self.nodes[0]
         n2 = self.nodes[1]
-        edge = Edge.objects.create(n_from=n1, n_to=n2, workflow=self.workflow)
+        edge = Edge.objects.create(
+            n_from=n1,
+            n_to=n2,
+            workflow=self.workflow,
+        )
 
         url = get_edge_url(self.workflow.id)
-        serializer = EdgeDetailSerializer(Edge.objects.all(), many=True)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]['id'], edge.id)
 
     def test_retrieve_only_workflow_edge(self):
         """Test retrieving only edge of on specified workflow"""
         workflow_2 = create_workflow(self.user)
         node1 = create_node(workflow=workflow_2, title="Node")
         node2 = create_node(workflow=workflow_2, title="Node")
-        edge = Edge.objects.create(n_from=node1, n_to=node2, workflow=workflow_2)
+        edge = Edge.objects.create(
+            n_from=node1,
+            n_to=node2,
+            workflow=workflow_2
+        )
         url = get_edge_url(workflow_id=self.workflow.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -170,7 +177,10 @@ class PrivateWorkflowApiTests(TestCase):
         edge = self.create_edge()
         workflow_2 = create_workflow(self.user)
         n2 = create_node(workflow=workflow_2)
-        url = get_edge_detail_url(workflow_id=self.workflow.id, edge_id=edge.id)
+        url = get_edge_detail_url(
+            workflow_id=self.workflow.id,
+            edge_id=edge.id
+        )
         payload = {
             'node_to': n2.id,
         }
@@ -188,7 +198,10 @@ class PrivateWorkflowApiTests(TestCase):
             "node_from": n3.id,
             'node_to': n4.id,
         }
-        url = get_edge_detail_url(edge_id=edge.id, workflow_id=self.workflow.id)
+        url = get_edge_detail_url(
+            edge_id=edge.id,
+            workflow_id=self.workflow.id
+        )
         res = self.client.put(url, data=payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         edge.refresh_from_db()
