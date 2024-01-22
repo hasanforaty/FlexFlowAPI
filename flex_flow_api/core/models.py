@@ -33,3 +33,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     objects = CustomUserManager()
+
+
+class Workflow(models.Model):
+    """Workflow model for our flexible workflows"""
+    title = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    create_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title

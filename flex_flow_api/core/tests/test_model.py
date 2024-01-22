@@ -1,6 +1,8 @@
-
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from core.models import (
+    Workflow
+)
 
 
 class ModelTests(TestCase):
@@ -44,3 +46,15 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
         self.assertEqual(user.email, email)
+
+    def test_create_workflow(self):
+        """Test creating a workflow"""
+        user = get_user_model().objects.create_user(
+            'test@example.com', 'password'
+        )
+        workflow = Workflow.objects.create(
+            title='Test Workflow',
+            description='testing workflow description',
+            create_by=user
+        )
+        self.assertEqual(str(workflow), workflow.title)
