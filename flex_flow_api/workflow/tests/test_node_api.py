@@ -161,3 +161,21 @@ class PrivateNodeApiTests(TestCase):
         node.refresh_from_db()
         self.assertEqual(node.title, payload['title'])
         self.assertEqual(node.workflow_id, self.workflow.id)
+
+    def test_delete_node(self):
+        """Test deleting a node"""
+        node = create_node(self.workflow)
+        res = self.client.delete(
+            get_node_detail_url(
+                node_id=node.id,
+                workflow_id=self.workflow.id
+            )
+        )
+        self.assertEqual(
+            res.status_code,
+            status.HTTP_204_NO_CONTENT,
+        )
+        self.assertNotIn(
+            node,
+            Node.objects.filter(workflow_id=self.workflow),
+        )
