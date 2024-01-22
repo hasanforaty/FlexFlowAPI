@@ -1,20 +1,36 @@
 from rest_framework import (
-    viewsets,
+    viewsets, mixins,
 )
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 
-from core.models import Workflow, Node
+from core.models import (
+    Workflow,
+    Node,
+    Edge,
+)
 from workflow.permisions import IsOwnerOfObject
 from workflow.serializer import (
     WorkflowSerializer,
     NodeSerializer,
+    EdgeSerializer,
 )
 
 
+class EdgeViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Edge.objects.all()
+    serializer_class = EdgeSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
 class NodeViewSet(
-   viewsets.ModelViewSet
+    viewsets.ModelViewSet
 ):
     queryset = Node.objects.all()
     serializer_class = NodeSerializer

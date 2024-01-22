@@ -1,6 +1,20 @@
 from rest_framework import serializers
+from core.models import (
+    Workflow,
+    Node,
+    Edge
+)
 
-from core.models import Workflow, Node
+
+class EdgeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Edge
+        fields = [
+            'id',
+            'node_from',
+            'node_to',
+        ]
+        read_only_fields = ['id']
 
 
 class NodeSerializer(serializers.ModelSerializer):
