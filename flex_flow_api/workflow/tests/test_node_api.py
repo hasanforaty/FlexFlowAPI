@@ -179,10 +179,16 @@ class PrivateNodeApiTests(TestCase):
             node,
             Node.objects.filter(workflow_id=self.workflow),
         )
+
     def test_get_node_details(self):
         """Test getting node details"""
         node = create_node(self.workflow)
-        res = self.client.get(get_node_detail_url(workflow_id=self.workflow.id,node_id=node.id))
+        res = self.client.get(
+            get_node_detail_url(
+                workflow_id=self.workflow.id,
+                node_id=node.id
+            )
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         s = NodeSerializer(node)
         self.assertEqual(s.data, res.data)

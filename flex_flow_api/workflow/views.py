@@ -1,17 +1,16 @@
 from rest_framework import (
     viewsets,
-    mixins,
 )
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 
 from core.models import Workflow, Node
+from workflow.permisions import IsOwnerOfObject
 from workflow.serializer import (
     WorkflowSerializer,
     NodeSerializer,
 )
-from workflow.permisions import IsOwnerOfObject
 
 
 class NodeViewSet(
