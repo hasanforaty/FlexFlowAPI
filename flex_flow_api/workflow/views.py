@@ -16,6 +16,7 @@ from workflow.permisions import IsOwnerOfObject
 
 class NodeViewSet(
     mixins.ListModelMixin,
+    mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Node.objects.all()
@@ -23,6 +24,12 @@ class NodeViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+    def get_queryset(self):
+        workflow_id = str(self.kwargs['workflow_pk'])
+        if workflow_id:
+            return Node.objects.filter(workflow_id=workflow_id)
+        return Node.objects
 
 
 class WorkflowViewSet(viewsets.ModelViewSet):

@@ -13,6 +13,13 @@ class NodeSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', ]
 
+    def create(self, validated_data):
+        workflow_pk = self.context['view'].kwargs['workflow_pk']
+        workflow = Workflow.objects.get(pk=workflow_pk)
+        node = Node.objects.create(workflow=workflow, **validated_data)
+        node.save()
+        return node
+
 
 class WorkflowSerializer(serializers.ModelSerializer):
     nodes = serializers.PrimaryKeyRelatedField(
