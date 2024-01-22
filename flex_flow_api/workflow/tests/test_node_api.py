@@ -15,6 +15,16 @@ def get_node_url(workflow_id):
     return reverse('node-list', kwargs={'workflow_pk': workflow_id})
 
 
+def get_node_detail_url(workflow_id, node_id):
+    return reverse(
+        'node-detail',
+        kwargs={
+            'workflow_pk': workflow_id,
+            'pk': node_id
+        }
+    )
+
+
 def get_node_list_url(node_id):
     return reverse('node-list', args=[node_id])
 
@@ -107,3 +117,47 @@ class PrivateNodeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nodes = Node.objects.filter(workflow_id=self.workflow.id)
         self.assertEqual(nodes.count(), 1)
+
+    def test_update_node(self):
+        """Test updating a node"""
+        node = create_node(self.workflow)
+        payload = {
+            'title': 'test title2',
+            'description': 'test34'
+        }
+        res = self.client.put(
+            get_node_detail_url(
+                self.workflow.id,
+                node_id=node.id
+            ), payload
+        )
+        self.assertEqual(
+            res.status_code,
+            status.HTTP_200_OK
+        )
+        node.refresh_from_db()
+        self.assertEqual(node.title, payload['title'])
+        self.assertEqual(
+            node.description,
+            payload['description'],
+        )
+        self.assertEqual(
+            node.workflow_id,
+            self.workflow.id,
+        )
+
+    def test_update_partial_node(self):
+        """Test updating a node partially"""
+        node = create_node(self.workflow)
+        payload = {'title': 'test'}
+        res = self.client.patch(
+            get_node_detail_url(
+                self.workflow.id,
+                node_id=node.id
+            ),
+            payload,
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        node.refresh_from_db()
+        self.assertEqual(node.title, payload['title'])
+        self.assertEqual(node.workflow_id, self.workflow.id)

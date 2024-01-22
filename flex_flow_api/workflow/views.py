@@ -17,6 +17,7 @@ from workflow.permisions import IsOwnerOfObject
 class NodeViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Node.objects.all()
