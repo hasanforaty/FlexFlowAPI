@@ -47,7 +47,7 @@ class Workflow(models.Model):
 
 class Node(models.Model):
     """Node model"""
-    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, related_name='nodes')
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 
