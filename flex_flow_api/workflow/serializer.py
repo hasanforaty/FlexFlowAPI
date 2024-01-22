@@ -7,6 +7,9 @@ from core.models import (
 
 
 class EdgeSerializer(serializers.ModelSerializer):
+    node_from = serializers.CharField()
+    node_to = serializers.CharField()
+
     class Meta:
         model = Edge
         fields = [
@@ -15,6 +18,17 @@ class EdgeSerializer(serializers.ModelSerializer):
             'node_to',
         ]
         read_only_fields = ['id']
+
+
+class EdgeDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Edge
+        fields = [
+            'id',
+            'n_to',
+            'n_from',
+        ]
+        read_only_fields = ['id', 'n_to', 'n_from']
 
 
 class NodeSerializer(serializers.ModelSerializer):
