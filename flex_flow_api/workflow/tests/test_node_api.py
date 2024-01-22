@@ -1,11 +1,15 @@
-from django.contrib.auth import get_user_model
-from django.test import TestCase, SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Node, Workflow
+from core.models import Node
 from workflow.serializer import NodeSerializer
+from workflow.tests.utills import (
+    create_workflow,
+    create_user,
+    create_node,
+)
 
 
 # NODE_URL = reverse('node-list')
@@ -29,47 +33,21 @@ def get_node_list_url(node_id):
     return reverse('node-list', args=[node_id])
 
 
-def create_workflow(user, **param):
-    """Create workflow"""
-    payload = {
-        'title': 'Test Workflow',
-        'description': 'testing workflow description'
-    }
-    payload.update(param)
-    workflow = Workflow.objects.create(
-        create_by=user,
-        **payload,
-    )
-    return workflow
-
-
-def create_user(**param):
-    """Create and return new User"""
-    user = get_user_model().objects.create_user(**param)
-    return user
-
-
-def create_node(workflow, **param):
-    """Create and save Node"""
-    payload = {
-        'title': 'Test Title',
-        'description': 'Test Description'
-    }
-    payload.update(param)
-    return Node.objects.create(workflow=workflow, **param)
-
-
-class PublicNodeApiTests(SimpleTestCase):
+class PublicNodeApiTests(TestCase):
     """Test the publicly available API endpoint"""
 
     def setUp(self):
         self.client = APIClient()
+        user = create_user(
+            email='user@example.com',
+            password='user_pass'
+        )
+        self.workflow = create_workflow(user=user)
 
     def test_login_required(self):
         """Test that Authentication is required for retrieving"""
-        # res = self.client.get(NODE_URL)
-        # self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-        pass
+        res = self.client.get(get_node_url(self.workflow.id))
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateNodeApiTests(TestCase):

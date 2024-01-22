@@ -1,7 +1,8 @@
+from django.db import IntegrityError
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core.models import (
-    Workflow, Node
+    Workflow, Node, Edge
 )
 
 
@@ -75,3 +76,59 @@ class ModelTests(TestCase):
             workflow=workflow
         )
         self.assertEqual(str(node), node.title)
+
+    def test_create_node_edge(self):
+        """Test creating Node connection between two Node"""
+        user = get_user_model().objects.create_user(
+            'test@example.com', 'password'
+        )
+        workflow = Workflow.objects.create(
+            title='Test Workflow',
+            description='testing workflow description',
+            create_by=user
+        )
+        node = Node.objects.create(
+            title='Test Node',
+            description='Num 1',
+            workflow=workflow
+        )
+        node2 = Node.objects.create(
+            title='Test Node2',
+            description='Num 2',
+            workflow=workflow
+        )
+        edge = Edge.objects.create(
+            n_from=node, n_to=node2,
+            workflow=workflow
+        )
+        self.assertEqual(str(edge), f'{node.title} -> {node2.title}')
+
+    def test_create_repeated_edge_raise_error(self):
+        """Test creating duplicate edge raises error"""
+        user = get_user_model().objects.create_user(
+            'test@example.com', 'password'
+        )
+        workflow = Workflow.objects.create(
+            title='Test Workflow',
+            description='testing workflow description',
+            create_by=user
+        )
+        node = Node.objects.create(
+            title='Test Node',
+            description='Num 1',
+            workflow=workflow
+        )
+        node2 = Node.objects.create(
+            title='Test Node2',
+            description='Num 2',
+            workflow=workflow
+        )
+        Edge.objects.create(
+            n_from=node, n_to=node2,
+            workflow=workflow
+        )
+        with self.assertRaises(IntegrityError):
+            Edge.objects.create(
+                n_from=node, n_to=node2,
+                workflow=workflow
+            )

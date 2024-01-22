@@ -52,8 +52,39 @@ class Node(models.Model):
         on_delete=models.CASCADE,
         related_name='nodes',
     )
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=False)
     description = models.CharField(max_length=255)
 
     def __str__(self):
         return self.title
+
+
+class Edge(models.Model):
+    n_from = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        related_name='from+',
+        blank=False
+    )
+    n_to = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        related_name='to+',
+        blank=False,
+    )
+    workflow = models.ForeignKey(
+        Workflow,
+        on_delete=models.CASCADE,
+        blank=False,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['n_from', 'n_to'],
+                name="unique_edge"
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.n_from} -> {self.n_to}'
