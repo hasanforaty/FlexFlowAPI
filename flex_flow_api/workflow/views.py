@@ -21,6 +21,7 @@ from workflow.serializer import (
 
 class EdgeViewSet(
     mixins.ListModelMixin,
+    mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = Edge.objects.all()
