@@ -1,3 +1,12 @@
-from django.contrib import admin # noqa
+from django.contrib import admin
+from core.models import (
+    User,
+    Workflow,
+    Node,
+    Edge,
+)
 
-# Register your models here.
+admin.site.register(User)
+admin.site.register(Workflow)
+admin.site.register(Node)
+admin.site.register(Edge)
