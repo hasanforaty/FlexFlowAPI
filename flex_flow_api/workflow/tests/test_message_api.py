@@ -17,6 +17,16 @@ def _get_url(workflow_id):
     return reverse('message-list', kwargs={'workflow_pk': workflow_id})
 
 
+def _get_detail_url(workflow_id, message_id):
+    return reverse(
+        'message-detail',
+        kwargs={
+            'workflow_pk': workflow_id,
+            'pk': message_id,
+        }
+    )
+
+
 class PublicMessageApiTests(TestCase):
     """Test the api without authentication"""
 
@@ -56,7 +66,7 @@ class PrivateMessageApiTests(TestCase):
         ]
 
     def test_creating_message(self):
-        """Test creating message and it's handler"""
+        """Test creating a message and it's handler"""
         text_message = 'Hello there'
         url = _get_url(self.workflow.id)
         payload = {
@@ -102,4 +112,12 @@ class PrivateMessageApiTests(TestCase):
         self.assertEqual(len(res.data), 2)
         serializer = MessageSerializer(other_message)
         self.assertNotIn(serializer.data, res.data)
-        print(res.data)
+
+    def test_retrieve_specific_message(self):
+        """Test retrieving specific message"""
+        msg = create_message(user=self.user, current_nod=self.edges[0].n_from)
+        url = _get_detail_url(workflow_id=self.workflow.id, message_id=msg.id)
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        serializer = MessageSerializer(msg)
+        self.assertEqual(serializer.data, res.data)

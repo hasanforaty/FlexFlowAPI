@@ -66,6 +66,7 @@ class WorkflowViewSet(viewsets.ModelViewSet):
 class MessageViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = Message.objects.all()
@@ -76,8 +77,13 @@ class MessageViewSet(
     def get_queryset(self):
         workflow_id = str(self.kwargs['workflow_pk'])
         if workflow_id:
-            return MessageHolder.objects.filter(
-                current_node__workflow_id=workflow_id
+            return Message.objects.filter(
+                id__in=MessageHolder.objects.filter(
+                    current_node__workflow_id=workflow_id
+                ).values_list(
+                    'message_id', flat=True
+                )
             )
+
 
 
