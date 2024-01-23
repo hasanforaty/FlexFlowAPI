@@ -44,6 +44,21 @@ class Workflow(models.Model):
     def __str__(self):
         return self.title
 
+    @classmethod
+    def get_starting_nodes(cls, workflow):
+        edges = Edge.objects.filter(workflow=workflow)
+        node_form = set()
+        node_to = set()
+        for edge in edges:
+            node_form.add(edge.n_from)
+            node_to.add(edge.n_to)
+        sd = node_form.symmetric_difference(node_to)
+        starting_node = set()
+        for node in sd:
+            if node in node_form:
+                starting_node.add(node)
+        return starting_node
+
 
 class Node(models.Model):
     """Node model"""

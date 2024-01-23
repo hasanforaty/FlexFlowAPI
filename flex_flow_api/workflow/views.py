@@ -73,6 +73,11 @@ class MessageViewSet(
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, ]
 
-
+    def get_queryset(self):
+        workflow_id = str(self.kwargs['workflow_pk'])
+        if workflow_id:
+            return MessageHolder.objects.filter(
+                current_node__workflow_id=workflow_id
+            )
 
 

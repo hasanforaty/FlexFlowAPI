@@ -9,6 +9,7 @@ from workflow.tests.utills import (
     create_workflow,
     create_user,
     create_node,
+    create_message,
 )
 
 
@@ -72,42 +73,33 @@ class PrivateMessageApiTests(TestCase):
         self.assertEqual(holder.first().message.message, text_message)
         self.assertEqual(holder.first().message.issuer, self.user)
 
-    # def test_retrieve_messages(self):
-    #     """Test retrieving all messages"""
-    #     text_message = 'Hello there'
-    #     Message.objects.create(
-    #         issuer=self.user,
-    #         message=text_message,
-    #     )
-    #     res = self.client.get(_get_url(self.workflow.id))
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(len(res.data), 1)
+    def test_retrieve_messages(self):
+        """Test retrieving all messages"""
+        create_message(user=self.user, current_nod=self.edges[0].n_from)
+        res = self.client.get(_get_url(self.workflow.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
 
-    # def test_retrieve_messages_limited_to_workflow(self):
-    #     """Test retrieving all messages limited to workflow"""
-    #     text_message = 'Hello there'
-    #     test_case = [
-    #         Message.objects.create(
-    #             issuer=self.user,
-    #             message=text_message,
-    #         ),
-    #         Message.objects.create(
-    #             issuer=self.user,
-    #             message=text_message,
-    #         )
-    #     ]
-    #     other_user = create_user(
-    #         email='other_user@example.com',
-    #         password='other_user_password'
-    #     )
-    #     create_workflow(user=other_user)
-    #
-    #     other_message = Message.objects.create(
-    #         issuer=other_user,
-    #         message=text_message,
-    #     )
-    #     res = self.client.get(_get_url(self.workflow.id))
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(len(res.data), 2)
-    #     serializer = MessageSerializer(other_message)
-    #     self.assertNotIn(serializer.data, res.data)
+    def test_retrieve_messages_limited_to_workflow(self):
+        """Test retrieving all messages limited to workflow"""
+        text_message = 'Hello there'
+        test_case = [
+            create_message(user=self.user, current_nod=self.edges[0].n_from),
+            create_message(user=self.user, current_nod=self.edges[0].n_from),
+        ]
+        other_user = create_user(
+            email='other_user@example.com',
+            password='other_user_password'
+        )
+        other_workflow = create_workflow(user=other_user)
+        n1 = create_node(workflow=other_workflow)
+        n2 = create_node(workflow=other_workflow)
+        Edge.objects.create(workflow=other_workflow, n_from=n1, n_to=n2)
+
+        other_message = create_message(user=other_user, current_nod=n1)
+        res = self.client.get(_get_url(self.workflow.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+        serializer = MessageSerializer(other_message)
+        self.assertNotIn(serializer.data, res.data)
+        print(res.data)

@@ -130,26 +130,12 @@ class MessageSerializer(serializers.ModelSerializer):
             raise BadRequest(f"No workflow with id ${workflow_id} was found")
         return attrs
 
-    def _get_starting_nodes(self, workflow):
-        edges = Edge.objects.filter(workflow=workflow)
-        node_form = set()
-        node_to = set()
-        for edge in edges:
-            node_form.add(edge.n_from)
-            node_to.add(edge.n_to)
-        sd = node_form.symmetric_difference(node_to)
-        starting_node = set()
-        for node in sd:
-            if node in node_form:
-                starting_node.add(node)
-        return starting_node
-
     def create(self, validated_data):
         """Create a new message, put it in starting nodes"""
         user = self.context['request'].user
         workflow_id = self.context['view'].kwargs.get('workflow_pk')
         workflow = Workflow.objects.filter(pk=workflow_id).first()
-        start_node = self._get_starting_nodes(workflow)
+        start_node = Workflow.get_starting_nodes(workflow)
         message = Message.objects.create(
             issuer=user,
             message=validated_data['message']

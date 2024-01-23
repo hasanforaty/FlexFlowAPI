@@ -1,6 +1,6 @@
 from core.models import (
     Workflow,
-    Node,
+    Node, Message, MessageHolder,
 )
 from django.contrib.auth import get_user_model
 
@@ -33,3 +33,20 @@ def create_node(workflow, **param):
     }
     payload.update(param)
     return Node.objects.create(workflow=workflow, **param)
+
+
+def create_message(user, current_nod, **param):
+    payload = {
+        'message': 'Test Message'
+    }
+    payload.update(param)
+    message = Message.objects.create(
+        issuer=user,
+        **payload,
+    )
+    MessageHolder.objects.create(
+        message=message,
+        current_node=current_nod
+    )
+    return message
+
