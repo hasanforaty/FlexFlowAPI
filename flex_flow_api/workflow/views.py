@@ -1,5 +1,5 @@
 from rest_framework import (
-    viewsets, )
+    viewsets, mixins, )
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
@@ -7,7 +7,7 @@ from rest_framework.settings import api_settings
 from core.models import (
     Workflow,
     Node,
-    Edge,
+    Edge, Message, MessageHolder,
 )
 from workflow.permisions import IsOwnerOfObject
 from workflow.serializer import (
@@ -15,6 +15,7 @@ from workflow.serializer import (
     NodeSerializer,
     EdgeSerializer,
     EdgeDetailSerializer,
+    MessageSerializer,
 )
 
 
@@ -60,3 +61,18 @@ class WorkflowViewSet(viewsets.ModelViewSet):
     serializer_class = WorkflowSerializer
     permission_classes = [IsAuthenticated, IsOwnerOfObject]
     authentication_classes = [TokenAuthentication, ]
+
+
+class MessageViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, ]
+
+
+
+
