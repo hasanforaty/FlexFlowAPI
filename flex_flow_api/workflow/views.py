@@ -16,6 +16,7 @@ from workflow.serializer import (
     EdgeSerializer,
     EdgeDetailSerializer,
     MessageSerializer,
+    MessageDetailSerializer,
 )
 
 
@@ -85,5 +86,9 @@ class MessageViewSet(
                 )
             )
 
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action in ['retrieve']:
+            return MessageDetailSerializer
+        return self.serializer_class
 
 

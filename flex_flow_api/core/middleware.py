@@ -12,9 +12,6 @@ class IntegrityMiddleware:
 
     def process_exception(self, request, exception):
         if isinstance(exception, IntegrityError):
-            print(exception)
-            print(exception.args)
-            print(exception)
             return HttpResponse(
                 content=str(exception),
                 status=HTTP_400_BAD_REQUEST,

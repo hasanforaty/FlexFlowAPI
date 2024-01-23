@@ -146,3 +146,17 @@ class MessageSerializer(serializers.ModelSerializer):
                 current_node=node
             )
         return message
+
+
+class MessageDetailSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    message = serializers.CharField()
+    current_node = serializers.ListField()
+
+    def __init__(self, *args, **kwargs):
+        current_nodes = MessageHolder.objects.filter(message_id=args[0].id)
+        node_list = []
+        for holder in current_nodes:
+            node_list.append(NodeSerializer(holder.current_node).data)
+        args[0].current_node = node_list
+        super().__init__(*args, **kwargs)

@@ -4,7 +4,10 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Message, Edge, MessageHolder
-from workflow.serializer import MessageSerializer
+from workflow.serializer import (
+    MessageSerializer,
+    MessageDetailSerializer,
+)
 from workflow.tests.utills import (
     create_workflow,
     create_user,
@@ -119,5 +122,5 @@ class PrivateMessageApiTests(TestCase):
         url = _get_detail_url(workflow_id=self.workflow.id, message_id=msg.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        serializer = MessageSerializer(msg)
+        serializer = MessageDetailSerializer(msg)
         self.assertEqual(serializer.data, res.data)
