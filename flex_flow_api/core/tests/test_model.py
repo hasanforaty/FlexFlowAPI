@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core.models import (
-    Workflow, Node, Edge, Message
+    Workflow, Node, Edge, Message, MessageHolder
 )
 
 
@@ -145,3 +145,37 @@ class ModelTests(TestCase):
         )
         self.assertEqual(message.issuer, user)
         self.assertEqual(message.message, 'test message')
+
+    def test_create_message_holder(self):
+        """Test creating message holder"""
+        user = get_user_model().objects.create_user(
+            'test@example.com', 'password'
+        )
+        workflow = Workflow.objects.create(
+            title='Test Workflow',
+            description='testing workflow description',
+            create_by=user
+        )
+        node = Node.objects.create(
+            title='Test Node',
+            description='Num 1',
+            workflow=workflow
+        )
+        message = Message.objects.create(
+            issuer=user,
+            message='test message'
+        )
+        holder = MessageHolder.objects.create(
+            current_node=node,
+            message=message
+        )
+        self.assertEqual(
+            holder.current_node,
+            node
+        )
+        self.assertEqual(
+            str(holder),
+            f"from : ${message.issuer}"
+            f" message : ${message.message} "
+            f"currently at ${holder.current_node}"
+        )

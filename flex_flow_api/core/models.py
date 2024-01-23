@@ -98,3 +98,15 @@ class Message(models.Model):
 
     def __str__(self):
         return f'${self.issuer} -> ${self.message}'
+
+
+class MessageHolder(models.Model):
+    """Message holder model"""
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    current_node = models.ForeignKey(Node, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return (f"from : ${self.message.issuer}"
+                f" message : ${self.message.message} "
+                f"currently at ${self.current_node}"
+                )
