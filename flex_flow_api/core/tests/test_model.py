@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core.models import (
-    Workflow, Node, Edge
+    Workflow, Node, Edge, Message
 )
 
 
@@ -132,3 +132,16 @@ class ModelTests(TestCase):
                 n_from=node, n_to=node2,
                 workflow=workflow
             )
+
+    def test_create_message_model(self):
+        """Test creating message model"""
+        user = get_user_model().objects.create_user(
+            email='test@example.com',
+            password='test_password',
+        )
+        message = Message.objects.create(
+            issuer=user,
+            message='test message'
+        )
+        self.assertEqual(message.issuer, user)
+        self.assertEqual(message.message, 'test message')

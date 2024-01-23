@@ -88,3 +88,13 @@ class Edge(models.Model):
 
     def __str__(self):
         return f'{self.n_from} -> {self.n_to}'
+
+
+class Message(models.Model):
+    """Message model"""
+    issuer = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    create_at = models.DateTimeField(auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return f'${self.issuer} -> ${self.message}'
