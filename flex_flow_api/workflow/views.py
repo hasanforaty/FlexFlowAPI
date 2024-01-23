@@ -90,5 +90,3 @@ class MessageViewSet(
         if self.action in ['retrieve']:
             return MessageDetailSerializer
         return self.serializer_class
-
-

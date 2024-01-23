@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Message, Edge, MessageHolder
+from core.models import Edge, MessageHolder
 from workflow.serializer import (
     MessageSerializer,
     MessageDetailSerializer,
@@ -63,9 +63,21 @@ class PrivateMessageApiTests(TestCase):
         self.n3 = create_node(workflow=self.workflow, title="Node 3")
         self.n4 = create_node(workflow=self.workflow, title="Node 4")
         self.edges = [
-            Edge.objects.create(workflow=self.workflow, n_from=self.n1, n_to=self.n2),
-            Edge.objects.create(workflow=self.workflow, n_from=self.n2, n_to=self.n3),
-            Edge.objects.create(workflow=self.workflow, n_from=self.n3, n_to=self.n4),
+            Edge.objects.create(
+                workflow=self.workflow,
+                n_from=self.n1,
+                n_to=self.n2,
+            ),
+            Edge.objects.create(
+                workflow=self.workflow,
+                n_from=self.n2,
+                n_to=self.n3,
+            ),
+            Edge.objects.create(
+                workflow=self.workflow,
+                n_from=self.n3,
+                n_to=self.n4,
+            ),
         ]
 
     def test_creating_message(self):
@@ -95,11 +107,8 @@ class PrivateMessageApiTests(TestCase):
 
     def test_retrieve_messages_limited_to_workflow(self):
         """Test retrieving all messages limited to workflow"""
-        text_message = 'Hello there'
-        test_case = [
-            create_message(user=self.user, current_nod=self.edges[0].n_from),
-            create_message(user=self.user, current_nod=self.edges[0].n_from),
-        ]
+        create_message(user=self.user, current_nod=self.edges[0].n_from),
+        create_message(user=self.user, current_nod=self.edges[0].n_from),
         other_user = create_user(
             email='other_user@example.com',
             password='other_user_password'

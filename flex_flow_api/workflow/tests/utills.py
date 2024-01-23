@@ -49,4 +49,3 @@ def create_message(user, current_nod, **param):
         current_node=current_nod
     )
     return message
-
