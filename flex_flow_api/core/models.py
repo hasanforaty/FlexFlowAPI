@@ -39,7 +39,11 @@ class Workflow(models.Model):
     """Workflow model for our flexible workflows"""
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
-    create_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    create_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+    )
 
     def __str__(self):
         return self.title
@@ -119,7 +123,7 @@ class Edge(models.Model):
 
 class Message(models.Model):
     """Message model"""
-    issuer = models.ForeignKey(User, on_delete=models.CASCADE)
+    issuer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     message = models.TextField()
     create_at = models.DateTimeField(auto_now_add=True, blank=True)
 
