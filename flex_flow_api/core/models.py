@@ -130,6 +130,7 @@ class MessageHolder(models.Model):
     """Message holder model"""
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     current_node = models.ForeignKey(Node, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return (f"from : ${self.message.issuer}"

@@ -125,6 +125,22 @@ class PrivateMessageApiTests(TestCase):
         serializer = MessageSerializer(other_message)
         self.assertNotIn(serializer.data, res.data)
 
+    def test_retrieve_active_messages(self):
+        """Test retrieving only active messages"""
+        deactive_message = create_message(
+            user=self.user,
+            current_nod=self.edges[2].n_from,
+            is_active=False
+        )
+        create_message(user=self.user, current_nod=self.edges[0].n_from)
+        create_message(user=self.user, current_nod=self.edges[1].n_from)
+        create_message(user=self.user, current_nod=self.edges[1].n_from)
+        res = self.client.get(_get_url(self.workflow.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 3)
+        serializer = MessageSerializer(deactive_message)
+        self.assertNotIn(serializer.data, res.data)
+
     def test_retrieve_specific_message(self):
         """Test retrieving specific message"""
         msg = create_message(user=self.user, current_nod=self.edges[0].n_from)

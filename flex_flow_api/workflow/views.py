@@ -1,3 +1,4 @@
+from drf_spectacular import openapi
 from rest_framework import (
     viewsets, mixins, )
 from rest_framework.authentication import TokenAuthentication
@@ -21,7 +22,9 @@ from workflow.serializer import (
 )
 from drf_spectacular.utils import (
     extend_schema_view,
-    extend_schema
+    extend_schema,
+    OpenApiParameter,
+    OpenApiTypes,
 )
 
 
@@ -85,7 +88,8 @@ class MessageViewSet(
         if workflow_id:
             return Message.objects.filter(
                 id__in=MessageHolder.objects.filter(
-                    current_node__workflow_id=workflow_id
+                    current_node__workflow_id=workflow_id,
+                    is_active=True,
                 ).values_list(
                     'message_id', flat=True
                 )
@@ -97,6 +101,26 @@ class MessageViewSet(
         return self.serializer_class
 
 
+@extend_schema_view(
+    create=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='message_pk',
+                type=OpenApiTypes.INT,
+                description='id of the message you want to give state to ',
+                required=True,
+                location=OpenApiParameter.PATH,
+            ),
+            OpenApiParameter(
+                name='workflow_pk',
+                type=OpenApiTypes.INT,
+                description='id of the workflow you want change message in it',
+                required=True,
+                location=OpenApiParameter.PATH,
+            ),
+        ]
+    )
+)
 class StatusView(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
