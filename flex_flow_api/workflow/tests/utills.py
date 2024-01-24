@@ -25,14 +25,18 @@ def create_user(**param):
     return user
 
 
-def create_node(workflow, **param):
+def create_node(workflow, is_finishing_nod=False, **param):
     """Create and save Node"""
     payload = {
         'title': 'Test Title',
         'description': 'Test Description'
     }
     payload.update(param)
-    return Node.objects.create(workflow=workflow, **param)
+    return Node.objects.create(
+        workflow=workflow,
+        is_finishing_node=is_finishing_nod,
+        **param
+    )
 
 
 def create_message(

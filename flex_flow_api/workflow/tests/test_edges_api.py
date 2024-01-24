@@ -63,6 +63,29 @@ class PrivateWorkflowApiTests(TestCase):
             create_node(workflow=self.workflow, title="Node 6"),
         ]
 
+    def test_add_edge_for_finishing_node(self):
+        finishing_node = create_node(
+            workflow=self.workflow,
+            title="Node 7",
+            is_finishing_nod=True
+        )
+        payload = {
+            "node_from": finishing_node.id,
+            'node_to': self.nodes[0].id,
+        }
+        res = self.client.post(
+            get_edge_url(
+                workflow_id=self.workflow.id
+            ),
+            payload
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        exists = Edge.objects.filter(
+            n_to=self.nodes[0],
+            n_from=finishing_node
+        ).exists()
+        self.assertFalse(exists)
+
     def test_retrieve_edge(self):
         """Test retrieving edge"""
         n1 = self.nodes[0]

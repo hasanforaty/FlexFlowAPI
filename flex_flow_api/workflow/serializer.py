@@ -41,6 +41,11 @@ class EdgeSerializer(serializers.ModelSerializer):
                     raise BadRequest(
                         "Both node and workflow must be in same workflow"
                     )
+            if key == 'n_from':
+                if attrs[key].is_finishing_node:
+                    raise BadRequest(
+                        "can't create an edge from a fishing node"
+                    )
         return attrs
 
     def create(self, validated_data):
