@@ -195,7 +195,7 @@ class StatusSerializer(serializers.Serializer):
         else:
             messageHolder.status = messageHolder.StatusChoices.REJECTED
 
-        if len(next_nodes) == 0:
+        if len(next_nodes) == 0 or validated_data['node'].is_finishing_node:
             #     we were in the last node , TODO
             # inform user about
             pass
