@@ -160,3 +160,48 @@ class MessageDetailSerializer(serializers.Serializer):
             node_list.append(NodeSerializer(holder.current_node).data)
         args[0].current_node = node_list
         super().__init__(*args, **kwargs)
+
+
+class StatusSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    node = serializers.PrimaryKeyRelatedField(
+        queryset=Node.objects.all()
+    )
+
+    def create(self, validated_data):
+        """Create a new message, put it in starting nodes"""
+        message_id = self.context['view'].kwargs.get('message_pk')
+        workflow_id = self.context['view'].kwargs.get('workflow_pk')
+        workflow = Workflow.objects.filter(pk=workflow_id).first()
+        messageHolder = MessageHolder.objects.get(
+            message_id=message_id,
+            current_node=validated_data['node']
+        )
+        if validated_data['status'] == 'approved':
+
+            next_nodes = Workflow.get_next_nodes(
+                workflow,
+                messageHolder.current_node
+            )
+            if len(next_nodes) == 0:
+                #     we were in the last node , TODO
+                pass
+            else:
+                for node in next_nodes:
+                    MessageHolder.objects.create(
+                        message=messageHolder.message,
+                        current_node=node
+                    )
+                messageHolder.delete()
+        else:
+            messageHolder.delete()
+        #     if denied TODO Implement
+        return validated_data
+
+    def validate(self, attrs):
+        status = attrs['status']
+        if status not in ['approved', 'rejected']:
+            raise serializers.ValidationError(
+                'Status must be approved or rejected'
+            )
+        return attrs

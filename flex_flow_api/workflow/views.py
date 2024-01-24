@@ -17,6 +17,11 @@ from workflow.serializer import (
     EdgeDetailSerializer,
     MessageSerializer,
     MessageDetailSerializer,
+    StatusSerializer,
+)
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema
 )
 
 
@@ -90,3 +95,13 @@ class MessageViewSet(
         if self.action in ['retrieve']:
             return MessageDetailSerializer
         return self.serializer_class
+
+
+class StatusView(
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = StatusSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, ]
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES

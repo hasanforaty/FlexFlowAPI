@@ -59,6 +59,17 @@ class Workflow(models.Model):
                 starting_node.add(node)
         return starting_node
 
+    @classmethod
+    def get_next_nodes(cls, workflow, current_nod):
+        edges = Edge.objects.filter(
+            workflow=workflow,
+            n_from=current_nod
+        ).all()
+        result = set()
+        for edge in edges:
+            result.add(edge.n_to)
+        return result
+
 
 class Node(models.Model):
     """Node model"""

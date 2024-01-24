@@ -6,6 +6,7 @@ from workflow.views import (
     NodeViewSet,
     EdgeViewSet,
     MessageViewSet,
+    StatusView,
 )
 
 router = DefaultRouter()
@@ -17,7 +18,8 @@ router.register(
     MessageViewSet,
     basename="message"
 )
+router.register("(?P<workflow_pk>[^/.]+)/messages/(?P<message_pk>[^/.]+)/status/", StatusView, basename="status")
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
 ]
