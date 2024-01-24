@@ -35,7 +35,12 @@ def create_node(workflow, **param):
     return Node.objects.create(workflow=workflow, **param)
 
 
-def create_message(user, current_nod, is_active=True, **param):
+def create_message(
+        user,
+        current_nod,
+        status=MessageHolder.StatusChoices.PENDING,
+        **param
+):
     payload = {
         'message': 'Test Message',
     }
@@ -47,6 +52,6 @@ def create_message(user, current_nod, is_active=True, **param):
     MessageHolder.objects.create(
         message=message,
         current_node=current_nod,
-        is_active=is_active
+        status=status
     )
     return message

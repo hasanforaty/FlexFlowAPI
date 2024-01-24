@@ -1,4 +1,9 @@
-from drf_spectacular import openapi
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter,
+    OpenApiTypes,
+)
 from rest_framework import (
     viewsets, mixins, )
 from rest_framework.authentication import TokenAuthentication
@@ -19,12 +24,6 @@ from workflow.serializer import (
     MessageSerializer,
     MessageDetailSerializer,
     StatusSerializer,
-)
-from drf_spectacular.utils import (
-    extend_schema_view,
-    extend_schema,
-    OpenApiParameter,
-    OpenApiTypes,
 )
 
 
@@ -89,7 +88,7 @@ class MessageViewSet(
             return Message.objects.filter(
                 id__in=MessageHolder.objects.filter(
                     current_node__workflow_id=workflow_id,
-                    is_active=True,
+                    status=MessageHolder.StatusChoices.PENDING,
                 ).values_list(
                     'message_id', flat=True
                 )

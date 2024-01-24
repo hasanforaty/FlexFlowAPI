@@ -128,9 +128,19 @@ class Message(models.Model):
 
 class MessageHolder(models.Model):
     """Message holder model"""
+
+    class StatusChoices(models.TextChoices):
+        PENDING = 'pending', 'pending'
+        APPROVED = 'approved', 'approved'
+        REJECTED = 'rejected', 'rejected'
+
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     current_node = models.ForeignKey(Node, on_delete=models.CASCADE)
-    is_active = models.BooleanField(default=True)
+    status = models.CharField(
+        choices=StatusChoices.choices,
+        default=StatusChoices.PENDING,
+        max_length=16
+    )
 
     def __str__(self):
         return (f"from : ${self.message.issuer}"

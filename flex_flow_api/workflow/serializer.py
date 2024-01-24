@@ -177,30 +177,29 @@ class StatusSerializer(serializers.Serializer):
             message_id=message_id,
             current_node=validated_data['node']
         )
+        next_nodes = Workflow.get_next_nodes(
+            workflow,
+            messageHolder.current_node
+        )
         if validated_data['status'] == 'approved':
-
-            next_nodes = Workflow.get_next_nodes(
-                workflow,
-                messageHolder.current_node
-            )
-            if len(next_nodes) == 0:
-                #     we were in the last node , TODO
-                pass
-            else:
-                for node in next_nodes:
-                    MessageHolder.objects.create(
-                        message=messageHolder.message,
-                        current_node=node
-                    )
-                messageHolder.delete()
+            for node in next_nodes:
+                MessageHolder.objects.create(
+                    message=messageHolder.message,
+                    current_node=node
+                )
         else:
-            messageHolder.delete()
-        #     if denied TODO Implement
+            messageHolder.status = messageHolder.StatusChoices.REJECTED
+
+        if len(next_nodes) == 0:
+            #     we were in the last node , TODO
+            # inform user about
+            pass
+        messageHolder.save()
         return validated_data
 
     def validate(self, attrs):
         status = attrs['status']
-        if status not in ['approved', 'rejected']:
+        if status.lower() not in ['approved', 'rejected']:
             raise serializers.ValidationError(
                 'Status must be approved or rejected'
             )

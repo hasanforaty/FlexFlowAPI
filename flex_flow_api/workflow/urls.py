@@ -18,7 +18,11 @@ router.register(
     MessageViewSet,
     basename="message"
 )
-router.register("(?P<workflow_pk>[^/.]+)/messages/(?P<message_pk>[^/.]+)/status/", StatusView, basename="status")
+router.register(
+    "(?P<workflow_pk>[^/.]+)/messages/(?P<message_pk>[^/.]+)/status/",
+    StatusView,
+    basename="status"
+)
 
 urlpatterns = [
     path('', include(router.urls)),

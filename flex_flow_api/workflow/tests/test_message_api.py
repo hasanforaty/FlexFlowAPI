@@ -130,7 +130,7 @@ class PrivateMessageApiTests(TestCase):
         deactive_message = create_message(
             user=self.user,
             current_nod=self.edges[2].n_from,
-            is_active=False
+            status=MessageHolder.StatusChoices.REJECTED
         )
         create_message(user=self.user, current_nod=self.edges[0].n_from)
         create_message(user=self.user, current_nod=self.edges[1].n_from)
