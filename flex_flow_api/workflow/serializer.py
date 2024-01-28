@@ -163,10 +163,16 @@ class MessageDetailSerializer(serializers.Serializer):
     current_node = serializers.ListField()
 
     def __init__(self, *args, **kwargs):
-        current_nodes = MessageHolder.objects.filter(message_id=args[0].id)
+        # make sure only pending is shown
+        current_nodes = MessageHolder.objects.filter(
+            message_id=args[0].id,
+            status=MessageHolder.StatusChoices.PENDING
+        )
         node_list = []
         for holder in current_nodes:
-            node_list.append(NodeSerializer(holder.current_node).data)
+            data = NodeSerializer(holder.current_node).data
+            data['status'] = holder.status
+            node_list.append(data)
         args[0].current_node = node_list
         super().__init__(*args, **kwargs)
 
@@ -207,7 +213,8 @@ class StatusSerializer(serializers.Serializer):
         workflow = Workflow.objects.filter(pk=workflow_id).first()
         messageHolder = MessageHolder.objects.get(
             message_id=message_id,
-            current_node=validated_data['node']
+            current_node=validated_data['node'],
+            status=MessageHolder.StatusChoices.PENDING
         )
         next_nodes = Workflow.get_next_nodes(
             workflow,
@@ -230,12 +237,7 @@ class StatusSerializer(serializers.Serializer):
         else:
             messageHolder.status = messageHolder.StatusChoices.REJECTED
 
-        if len(next_nodes) == 0 or validated_data['node'].is_finishing_node:
-            #     we were in the last node , TODO
-            # inform user about
-            pass
         messageHolder.save()
-        # TODO : create History
         item = MessageHolderHistoryItem(
             user=self.context['request'].user,
             status=validated_data['status'],
@@ -245,7 +247,17 @@ class StatusSerializer(serializers.Serializer):
         history.histories.append(historyserializer)
         history.save()
 
-        messageHolder.delete()
+        if len(next_nodes) == 0 or validated_data['node'].is_finishing_node:
+            #  we were in the last node , TODO
+            # inform user about
+            holders = MessageHolder.objects.filter(
+                message_id=message_id,
+                status=MessageHolder.StatusChoices.PENDING,
+            )
+            for holder in holders:
+                holder.status = messageHolder.status
+                holder.save()
+
         return validated_data
 
     def validate(self, attrs):
