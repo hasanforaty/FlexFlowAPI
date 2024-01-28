@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager,
@@ -148,3 +150,16 @@ class MessageHolder(models.Model):
                 f" message : ${self.message.message} "
                 f"currently at ${self.current_node}"
                 )
+
+
+class History(models.Model):
+    histories = models.JSONField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
