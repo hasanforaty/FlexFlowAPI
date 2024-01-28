@@ -246,14 +246,15 @@ class StatusSerializer(serializers.Serializer):
         historyserializer = item.serialize().data
         history.histories.append(historyserializer)
         history.save()
-
         if len(next_nodes) == 0 or validated_data['node'].is_finishing_node:
             #  we were in the last node , TODO
             # inform user about
+            # if we are at ending node , find all of pending holder
             holders = MessageHolder.objects.filter(
                 message_id=message_id,
                 status=MessageHolder.StatusChoices.PENDING,
             )
+            # change pending holder to final status
             for holder in holders:
                 holder.status = messageHolder.status
                 holder.save()
