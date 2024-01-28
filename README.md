@@ -37,20 +37,43 @@ FlexFlow API is a RESTful application that allows you to create and manage workf
    ```
    The API should now be accessible at http://localhost:8000/.
 ## API Endpoints
-# Workflows
-- GET /workflows: Get a list of all workflows.
-- POST /workflows: Create a new workflow.
-- GET /workflows/{workflow_id}: Get details of a specific workflow.
-- PUT /workflows/{workflow_id}: Update details of a specific workflow.
-- DELETE /workflows/{workflow_id}: Delete a specific workflow.
-# Nodes
-- GET /workflows/{workflow_id}/nodes: Get a list of nodes for a specific workflow.
-- POST /workflows/{workflow_id}/nodes: Create a new node for a specific workflow.
-- GET /workflows/{workflow_id}/nodes/{node_id}: Get details of a specific node.
-- PUT /workflows/{workflow_id}/nodes/{node_id}: Update details of a specific node.
-- DELETE /workflows/{workflow_id}/nodes/{node_id}: Delete a specific node.
+# Users
+- Login: POST /api/users/login/
+- Retrieve User: GET /api/users/me/
+- Update User: PUT /api/users/me/
+- Partial Update User: PATCH /api/users/me/
+- Register User: POST /api/users/register/
+# Workflow
+- List Workflows: GET /api/workflow/
+- Create Workflow: POST /api/workflow/
+- Retrieve Workflow: GET /api/workflow/{workflowId}/
+- Update Workflow: PUT /api/workflow/{workflowId}/
+- Partial Update Workflow: PATCH /api/workflow/{workflowId}/
+- Delete Workflow: DELETE /api/workflow/{workflowId}/
+# Node
+- List Nodes in Workflow: GET /api/workflow/{workflowId}/nodes/
+- Create Node in Workflow: POST /api/workflow/{workflowId}/nodes/
+- Retrieve Node in Workflow: GET /api/workflow/{workflowId}/nodes/{nodeId}/
+- Update Node in Workflow: PUT /api/workflow/{workflowId}/nodes/{nodeId}/
+- Partial Update Node in Workflow: PATCH /api/workflow/{workflowId}/nodes/{nodeId}/
+- Delete Node in Workflow: DELETE /api/workflow/{workflowId}/nodes/{nodeId}/
+# Edge
+- List Edges in Workflow: GET /api/workflow/{workflowId}/edges/
+- Create Edge in Workflow: POST /api/workflow/{workflowId}/edges/
+- Retrieve Edge in Workflow: GET /api/workflow/{workflowId}/edges/{edgeId}/
+- Update Edge in Workflow: PUT /api/workflow/{workflowId}/edges/{edgeId}/
+- Partial Update Edge in Workflow: PATCH /api/workflow/{workflowId}/edges/{edgeId}/
+- Delete Edge in Workflow: DELETE /api/workflow/{workflowId}/edges/{edgeId}/
 # Messages
-- POST /workflows/{workflow_id}/messages: Submit a message through the workflow for approval.
+- List Messages in Workflow: GET /api/workflow/{workflowId}/messages/
+- Create Message in Workflow: POST /api/workflow/{workflowId}/messages/
+- Retrieve Message in Workflow: GET /api/workflow/{workflowId}/messages/{messageId}/
+- Retrieve Message History: GET /api/workflow/{workflowId}/messages/{messageId}/history/
+- Change Message Status: POST /api/workflow/{workflowId}/messages/{messageId}/status/
+# Schema
+- Retrieve OpenAPI Schema: GET /api/schema/
+# History
+- List History: GET /api/history/
 
 ## Testing
 To run tests for the API, use the following command:
