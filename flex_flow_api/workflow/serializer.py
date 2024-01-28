@@ -182,7 +182,9 @@ class MessageHolderHistoryItem:
 
 
 class MessageHolderHistorySerializer(serializers.Serializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all())
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=get_user_model().objects.all()
+    )
     timestamp = serializers.DateTimeField(default=timezone.now)
     status = serializers.CharField(max_length=255)
     node = serializers.CharField()
