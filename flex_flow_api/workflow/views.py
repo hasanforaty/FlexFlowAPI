@@ -1,12 +1,17 @@
+from rest_framework.response import Response
+
+from django.http import HttpResponseBadRequest
 from drf_spectacular.utils import (
     extend_schema_view,
     extend_schema,
     OpenApiParameter,
     OpenApiTypes,
 )
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import (
-    viewsets, mixins, )
+    viewsets, mixins)
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 
@@ -14,7 +19,9 @@ from core.models import (
     Workflow,
     Node,
     Edge, Message, MessageHolder,
+    History,
 )
+from history.serializers import HistorySerializer
 from workflow.permisions import IsOwnerOfObject
 from workflow.serializer import (
     WorkflowSerializer,
@@ -98,6 +105,23 @@ class MessageViewSet(
         if self.action in ['retrieve']:
             return MessageDetailSerializer
         return self.serializer_class
+
+    @action(detail=True, methods=['GET'], name='history')
+    def history(self, request, *args, **kwargs):
+        workflow_id = str(kwargs['workflow_pk'])
+        messages_id = str(kwargs['pk'])
+        message = MessageHolder.objects.filter(
+            message_id=messages_id,
+            current_node__workflow_id=workflow_id
+        )
+        if not message.exists():
+            return HttpResponseBadRequest(content='Message not found')
+        history = History.objects.filter(
+            object_id=messages_id,
+            content_type=ContentType.objects.get_for_model(Message)
+        )
+        serializer = HistorySerializer(history, many=True)
+        return Response(serializer.data,)
 
 
 @extend_schema_view(

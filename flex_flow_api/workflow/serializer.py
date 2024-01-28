@@ -1,4 +1,5 @@
 from django.core.exceptions import BadRequest
+from django.utils import timezone
 from rest_framework import serializers
 from core.models import (
     Workflow,
@@ -165,6 +166,12 @@ class MessageDetailSerializer(serializers.Serializer):
             node_list.append(NodeSerializer(holder.current_node).data)
         args[0].current_node = node_list
         super().__init__(*args, **kwargs)
+
+
+class MessageHolderHistorySerializer(serializers.Serializer):
+    user = serializers.CharField(max_length=255)
+    timestamp = serializers.DateTimeField(default=timezone.now)
+    status = serializers.CharField(max_length=255)
 
 
 class StatusSerializer(serializers.Serializer):

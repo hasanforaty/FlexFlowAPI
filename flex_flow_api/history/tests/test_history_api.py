@@ -3,6 +3,7 @@ from django.test import TestCase, SimpleTestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
+from django.contrib.contenttypes.models import ContentType
 
 from core.models import History, Message
 from history.serializers import HistorySerializer
@@ -45,13 +46,14 @@ class PrivateHistoryApiTests(TestCase):
                 'message': 'Hello World!2'
             },
         ]
-        self.histories = [
-            History.objects.create(
-                histories=payload,
-                content_object=Message.objects.create(
+        self.message = Message.objects.create(
                     issuer=user,
                     message='Hello World!'
                 )
+        self.histories = [
+            History.objects.create(
+                histories=payload,
+                content_object=self.message
             ),
             History.objects.create(
                 histories=payload2,
