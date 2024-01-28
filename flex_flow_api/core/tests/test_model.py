@@ -1,8 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.test import TestCase
-from django.contrib.auth import get_user_model
+
 from core.models import (
-    Workflow, Node, Edge, Message, MessageHolder
+    Workflow, Node, Edge, Message, MessageHolder, History
 )
 
 
@@ -179,3 +180,22 @@ class ModelTests(TestCase):
             f" message : ${message.message} "
             f"currently at ${holder.current_node}"
         )
+
+    def test_create_history(self):
+        user = get_user_model().objects.create_user(
+            email='test@example.com',
+            password='test_password',
+        )
+        message = Message.objects.create(
+            issuer=user,
+            message='test message'
+        )
+        payload = {
+            'message': message.message,
+            'issuer': message.issuer.id,
+        }
+        history = History.objects.create(
+            histories=payload,
+            content_object=message,
+        )
+        self.assertEqual(history.content_object, message)

@@ -75,3 +75,16 @@ class StatusAPITest(TestCase):
         changed_nodes = holder.all().distinct()
         for node in pre_nodes:
             self.assertNotIn(node, changed_nodes)
+
+    def test_approve_message_History(self):
+        """Test approving a message"""
+        self.test_approve_message()
+        url = reverse(
+            'message-detail',
+            kwargs={
+                'workflow_pk': self.workflow.id,
+                'pk': self.message.id,
+            }
+        ) + 'history/'
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

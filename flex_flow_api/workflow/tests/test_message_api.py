@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Edge, MessageHolder
+from core.models import Edge, MessageHolder, History
 from workflow.serializer import (
     MessageSerializer,
     MessageDetailSerializer,
@@ -149,3 +149,43 @@ class PrivateMessageApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         serializer = MessageDetailSerializer(msg)
         self.assertEqual(serializer.data, res.data)
+
+    def test_retrieve_message_history_mismatch(self):
+        """Test retrieving messages history"""
+        message = create_message(
+            user=self.user,
+            current_nod=self.edges[0].n_from
+        )
+        create_message(user=self.user, current_nod=self.edges[0].n_from)
+        other_user = create_user(
+            email='other_user@example.com',
+            password='other_user_password'
+        )
+        other_workflow = create_workflow(user=other_user)
+        n1 = create_node(workflow=other_workflow)
+        n2 = create_node(workflow=other_workflow)
+        Edge.objects.create(workflow=other_workflow, n_from=n1, n_to=n2)
+
+        create_message(user=other_user, current_nod=n1)
+        url = _get_detail_url(
+            workflow_id=other_workflow.id,
+            message_id=message.id) + "history/"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_message_history(self):
+        """Test retrieving message's History"""
+        message = create_message(
+            user=self.user,
+            current_nod=self.edges[0].n_from
+        )
+        History.objects.create(
+            histories={'message': message.message},
+            content_object=message
+        )
+        url = _get_detail_url(
+            workflow_id=self.workflow.id,
+            message_id=message.id) + "history/"
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)

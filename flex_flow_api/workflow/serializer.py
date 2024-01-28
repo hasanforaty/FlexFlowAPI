@@ -1,10 +1,13 @@
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import BadRequest
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework import serializers
 from core.models import (
     Workflow,
     Node,
     Edge,
-    Message, MessageHolder,
+    Message, MessageHolder, History,
 )
 from rest_framework.exceptions import PermissionDenied
 
@@ -80,6 +83,7 @@ class NodeSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'description',
+            'is_finishing_node'
         ]
         read_only_fields = ['id', ]
 
@@ -167,6 +171,29 @@ class MessageDetailSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
 
 
+class MessageHolderHistoryItem:
+    def __init__(self, user, status, node):
+        self.user = user
+        self.status = status,
+        self.nodeSerializer = node
+
+    def serialize(self):
+        return MessageHolderHistorySerializer(self)
+
+
+class MessageHolderHistorySerializer(serializers.Serializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=get_user_model().objects.all()
+    )
+    timestamp = serializers.DateTimeField(default=timezone.now)
+    status = serializers.CharField(max_length=255)
+    node = serializers.CharField()
+
+    def __init__(self, *args, **kwargs):
+        args[0].node = args[0].nodeSerializer.data
+        super().__init__(*args, **kwargs)
+
+
 class StatusSerializer(serializers.Serializer):
     status = serializers.CharField()
     node = serializers.PrimaryKeyRelatedField(
@@ -186,12 +213,20 @@ class StatusSerializer(serializers.Serializer):
             workflow,
             messageHolder.current_node
         )
+        history, created = History.objects.get_or_create(
+            content_type=ContentType.objects.get_for_model(Message),
+            object_id=message_id,
+            defaults={
+                'histories': []
+            }
+        )
         if validated_data['status'] == 'approved':
             for node in next_nodes:
                 MessageHolder.objects.create(
                     message=messageHolder.message,
                     current_node=node
                 )
+            messageHolder.status = messageHolder.StatusChoices.APPROVED
         else:
             messageHolder.status = messageHolder.StatusChoices.REJECTED
 
@@ -200,6 +235,17 @@ class StatusSerializer(serializers.Serializer):
             # inform user about
             pass
         messageHolder.save()
+        # TODO : create History
+        item = MessageHolderHistoryItem(
+            user=self.context['request'].user,
+            status=validated_data['status'],
+            node=NodeSerializer(messageHolder.current_node)
+        )
+        historyserializer = item.serialize().data
+        history.histories.append(historyserializer)
+        history.save()
+
+        messageHolder.delete()
         return validated_data
 
     def validate(self, attrs):
