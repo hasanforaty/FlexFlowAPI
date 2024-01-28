@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'user',
     'rest_framework.authtoken',
     'workflow',
-
+    'history'
 ]
 
 MIDDLEWARE = [

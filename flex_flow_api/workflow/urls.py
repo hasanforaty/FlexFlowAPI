@@ -19,7 +19,7 @@ router.register(
     basename="message"
 )
 router.register(
-    "(?P<workflow_pk>[^/.]+)/messages/(?P<message_pk>[^/.]+)/status/",
+    "(?P<workflow_pk>[^/.]+)/messages/(?P<message_pk>[^/.]+)/status",
     StatusView,
     basename="status"
 )
