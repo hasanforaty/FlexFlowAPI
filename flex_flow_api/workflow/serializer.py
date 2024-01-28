@@ -199,6 +199,7 @@ class StatusSerializer(serializers.Serializer):
                     message=messageHolder.message,
                     current_node=node
                 )
+            messageHolder.status = messageHolder.StatusChoices.APPROVED
         else:
             messageHolder.status = messageHolder.StatusChoices.REJECTED
 
@@ -207,6 +208,8 @@ class StatusSerializer(serializers.Serializer):
             # inform user about
             pass
         messageHolder.save()
+        # TODO : create History
+        messageHolder.delete()
         return validated_data
 
     def validate(self, attrs):
