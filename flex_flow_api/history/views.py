@@ -16,3 +16,8 @@ class HistoryViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return HistorySerializer
+
